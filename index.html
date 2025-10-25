@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File ke Google Drive</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f8fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+    h3 { color: #333; }
+    input[type="file"] {
+      border: 1px solid #ccc;
+      padding: 6px;
+      width: 100%;
+    }
+    button {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+    #status { margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Upload File ke Google Drive</h3>
+    <form id="uploadForm">
+      <input type="file" name="file" accept=".docx,.xlsx" required><br>
+      <button type="submit">Upload</button>
+    </form>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    // 🔗 Ganti dengan URL Web App dari langkah 3
+    const scriptURL = "https://script.google.com/macros/s/AKfycbxTxdKV6NN0OGXEUdgzHgceNgqN3AkHrea-UQuyKgSIGTdU_rJeCSb7-B9ISkVzeiLH5g/exec";
+
+    document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fileInput = e.target.querySelector('input[type=file]');
+      const file = fileInput.files[0];
+
+      // Validasi tipe file
+      const allowed = ['application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                       'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'];
+      if (!allowed.includes(file.type)) {
+        document.getElementById('status').innerText = "❌ Hanya file .docx atau .xlsx yang diizinkan!";
+        return;
+      }
+
+      // Validasi ukuran file (maks 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        document.getElementById('status').innerText = "❌ Ukuran file maksimal 10MB!";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      document.getElementById('status').innerText = "⏳ Sedang mengunggah...";
+
+      try {
+        const res = await fetch(scriptURL, { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('status').innerHTML =
+            `✅ Upload berhasil! <br>Nama: <b>${data.name}</b><br>
+             <a href="${data.url}" target="_blank">📂 Lihat di Google Drive</a>`;
+        } else {
+          document.getElementById('status').innerText = "❌ Gagal: " + data.error;
+        }
+      } catch (err) {
+        document.getElementById('status').innerText = "❌ Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
