@@ -1,6 +1,87 @@
-<form method="POST" 
-      enctype="multipart/form-data"
-      action="https://script.google.com/macros/s/AKfycbz6rTytVAphZeGq7_WA9xNxFdeqe98dT2SLj5SLCGDY8sLnIhWyTnfsZOFYQjQAU_IbrQ/exec">
-  <input type="file" name="file" accept=".docx,.xlsx" required><br><br>
-  <button type="submit">Upload</button>
-</form>
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload File ke Google Drive</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f6f8fa;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      width: 320px;
+      text-align: center;
+    }
+    h3 { color: #333; }
+    input[type="file"] {
+      border: 1px solid #ccc;
+      padding: 6px;
+      width: 100%;
+    }
+    button {
+      background-color: #28a745;
+      border: none;
+      color: white;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background-color: #218838; }
+    #status { margin-top: 10px; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h3>Upload File ke Google Drive</h3>
+
+    <!-- FORM UPLOAD -->
+    <form id="uploadForm"
+          method="POST"
+          enctype="multipart/form-data"
+          action="https://script.google.com/macros/s/AKfycbz6rTytVAphZeGq7_WA9xNxFdeqe98dT2SLj5SLCGDY8sLnIhWyTnfsZOFYQjQAU_IbrQ/exec"
+          target="uploadFrame"
+          onsubmit="document.getElementById('status').innerText='⏳ Sedang mengunggah...';">
+      <input type="file" name="file" accept=".docx,.xlsx" required><br><br>
+      <button type="submit">Upload</button>
+    </form>
+
+    <iframe name="uploadFrame" id="uploadFrame" style="display:none;"></iframe>
+    <p id="status"></p>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('uploadFrame');
+    const status = document.getElementById('status');
+
+    // Saat iframe selesai memuat respons dari Apps Script
+    iframe.addEventListener('load', () => {
+      try {
+        const doc = iframe.contentDocument || iframe.contentWindow.document;
+        const text = doc.body.innerText;
+        if (!text) return;
+        const data = JSON.parse(text);
+        if (data.success) {
+          status.innerHTML = `✅ Upload berhasil!<br>
+            Nama: <b>${data.name}</b><br>
+            <a href="${data.url}" target="_blank">📂 Lihat di Google Drive</a>`;
+        } else {
+          status.innerText = "❌ " + data.error;
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  </script>
+</body>
+</html>
