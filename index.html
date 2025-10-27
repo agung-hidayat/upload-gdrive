@@ -1,0 +1,11 @@
+<form method="POST" 
+      enctype="multipart/form-data"
+      action="https://script.google.com/macros/s/AKfycbxTxdKV6NN0OGXEUdgzHgceNgqN3AkHrea-UQuyKgSIGTdU_rJeCSb7-B9ISkVzeiLH5g/exec"
+      target="hidden_iframe"
+      onsubmit="document.getElementById('status').innerText='⏳ Sedang mengunggah...';">
+  <input type="file" name="file" accept=".docx,.xlsx" required><br><br>
+  <button type="submit">Upload</button>
+</form>
+
+<iframe name="hidden_iframe" style="display:none;"></iframe>
+<p id="status"></p>
